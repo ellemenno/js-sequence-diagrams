@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>jsqde</title>
+</head>
+
+<body style="font-size:smaller">
+
+<h3>Syntax
+(<a href="http://bramp.github.io/js-sequence-diagrams/">full reference</a>)
+</h3>
+<pre>
+#Comment
+
+Title: Here is a title
+participant C
+participant B
+participant A
+
+A->B: Normal line
+B-->C: Dashed line
+C->>D: Open arrow
+D-->>A: Dashed open arrow
+Note left of A: By listing the participants\n you can change their order
+</pre>
+
+<textarea id="language" rows="12" cols="72" style="font-size:larger">
+#Comment
+
+Title: Here is a title
+participant C
+participant B
+participant A
+
+A->B: Normal line
+B-->C: Dashed line
+C->>D: Open arrow
+D-->>A: Dashed open arrow
+Note left of A: By listing the participants\n you can change their order
+</textarea>
+
+<div id="diagram"></div>
+<a href="#" id="download">Download as SVG</a>
+
+<script src="jquery.min.js"></script>
+<script src="underscore-min.js"></script>
+<script src="raphael-min.js"></script>
+<script src="sequence-diagram-min.js"></script>
+<script src="svginnerhtml.min.js"></script>
+
+<script>
+	function clear() {
+		$('#diagram').html('');
+	}
+
+	function parse() {
+		try { return Diagram.parse($('#language').val()); }
+		catch(e) { }
+	}
+
+	function refresh() {
+		var diagram = parse();
+
+		if (diagram) {
+			clear();
+			//diagram.drawSVG('diagram', {theme: 'hand'});
+			diagram.drawSVG('diagram', {theme: 'simple'});
+		}
+	}
+
+	function save() {
+		var svg = $('#diagram').find('svg')[0];
+		var width = parseInt(svg.width.baseVal.value);
+		var height = parseInt(svg.height.baseVal.value);
+		var data = $('#language').val();
+		var xml = '<?xml version="1.0" encoding="utf-8" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd"><svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height + '" xmlns:xlink="http://www.w3.org/1999/xlink"><source><![CDATA[' + data + ']]></source>' + svg.innerHTML + '</svg>';
+
+		var a = $(this);
+		a.attr("download", "diagram.svg");
+		a.attr("href", "data:image/svg+xml," + encodeURIComponent(xml));
+	}
+
+	$(document).ready(function(){
+		$('#language').change(refresh).change();
+		$('#language').keyup(_.throttle(refresh, 650));
+		$('#download').click(save);
+	});
+</script>
+
+</body>
+</html>
